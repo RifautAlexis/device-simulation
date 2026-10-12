@@ -12,6 +12,7 @@ Example `config.json`:
 
 ```json
 {
+  "tickIntervalMilliseconds": 1000,
   "devices": [
     {
       "kind": 1,
@@ -35,11 +36,14 @@ Example `config.json`:
 ### Properties
 
 - `devices`: required array of devices to simulate. An empty array is valid. Multiple devices may share the same `kind`.
+- `tickIntervalMilliseconds`: optional simulation interval in milliseconds (default `1000`, allowed range `1–60000`).
 - `kind`: required integer identifying the device type. Only supported values are accepted.
 - `ipAddress`: required valid IPv4 address on which the device API must listen.
 - `port`: required integer in the TCP port range `1–65535`.
 
 Each device must have a unique `ipAddress` and `port` combination.
+
+The example `config.json` is copied beside the executable during build and publish. Edit that file to choose the device endpoints. The application binds only to the configured IPv4 addresses; those addresses must be assigned to a local network interface. If a port is already in use or an address cannot be bound, startup fails with an error.
 
 The application must validate the configuration before starting. If the file is missing, contains invalid JSON, or violates the expected structure or property constraints, the application must report meaningful errors and terminate.
 
@@ -140,7 +144,7 @@ Each simulated device must expose its own HTTP API at its configured `ipAddress`
 
 ### 6.1. Retrieve device data
 
-`GET /device/{id}`
+`GET /device`
 
 Returns the current state of the requested device.
 
@@ -178,7 +182,7 @@ Expected responses:
 
 ### 6.2. Update device properties
 
-`PATCH /device/{id}/data`
+`PATCH /device/data`
 
 Updates one or more properties of the specified device's `data` object.
 
@@ -223,7 +227,7 @@ Each device has an `available` boolean property, initially set to `true`.
 
 ### 7.1. Set availability
 
-`PUT /device/{id}/availability`
+`PUT /device/availability`
 
 Request body:
 
@@ -248,7 +252,7 @@ Each device has a `delayMilliseconds` property, initially set to `0`.
 
 ### 8.1. Set response delay
 
-`PUT /device/{id}/delay`
+`PUT /device/delay`
 
 Request body:
 
@@ -263,6 +267,7 @@ Expected behavior:
 - The delay must be a non-negative integer with a documented maximum.
 - `0` disables the artificial delay.
 - `2000` introduces a two-second delay before responding to subsequent data requests.
+- The documented maximum delay is `60000` milliseconds (one minute).
 - `400 Bad Request`: invalid delay.
 - `404 Not Found`: device does not exist.
 
@@ -294,3 +299,22 @@ Include automated tests covering:
 - Continued simulation during delayed requests.
 
 The application must build and run on Windows and Linux.
+
+## Build and run
+
+Install the .NET 8 SDK, then run:
+
+```sh
+dotnet build DeviceSimulation.sln
+dotnet test DeviceSimulation.sln
+dotnet run --project src/DeviceSimulation
+```
+
+Publish a self-contained executable with a platform-specific runtime identifier:
+
+```sh
+dotnet publish src/DeviceSimulation -c Release -r win-x64 --self-contained true
+dotnet publish src/DeviceSimulation -c Release -r linux-x64 --self-contained true
+```
+
+`config.json` is published beside the executable and remains an external, editable configuration file.

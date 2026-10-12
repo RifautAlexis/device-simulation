@@ -1,0 +1,25 @@
+{
+  "tickIntervalMilliseconds": 1000,
+  "devices": [
+    {
+      "kind": 3,
+      "ipAddress": "127.0.0.1",
+      "port": 5001
+    },
+    {
+      "kind": 1,
+      "ipAddress": "127.0.0.1",
+      "port": 5002
+    },
+    {
+      "kind": 2,
+      "ipAddress": "127.0.0.1",
+      "port": 5003
+    },
+    {
+      "kind": 3,
+      "ipAddress": "127.0.0.1",
+      "port": 5004
+    }
+  ]
+}
